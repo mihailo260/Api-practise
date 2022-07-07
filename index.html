@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<style>
+    body {
+        text-align: center;
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+    }
+
+    .wrapper {
+        width: 80%;
+        margin: 0 auto;
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+
+    .single-item {
+        background-color: aqua;
+        width: 33%;
+        border-radius: 10px;
+        height: 500px;
+        background-repeat: no-repeat;
+        background-size: cover;
+        background-position: center;
+        transition: 1s all ease-in-out;
+        transform: scale(0.9);
+    }
+
+    .single-item:hover {
+        transform: scale(0.97);
+    }
+
+    .modalScreen {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100vh;
+        background-color: rgba(71, 71, 71, 0.7);
+        z-index: 1;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        display: none;
+
+    }
+
+    .modalItem {
+        width: 50%;
+        background-color: white;
+        border-radius: 15px;
+        padding: 15px 0;
+
+
+    }
+
+    .modalHeader {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 0 40px;
+    }
+
+    .Xbtn {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background-color: brown;
+        border-radius: 50%;
+        width: 30px;
+        height: 30px;
+        padding: 5px;
+        cursor: pointer;
+        color: white;
+        transition: 1s all ease-in-out;
+
+    }
+
+    .Xbtn:hover {
+        transform: rotate(360deg);
+        transition: 1s all ease-in-out;
+    }
+
+    .modalBody {
+        width: 100%;
+
+    }
+
+    .modalBody img {
+        width: 90%;
+        margin: 0 auto;
+        height: 60vh;
+        display: block;
+        border-radius: 15px;
+    }
+
+    .modalDesc {}
+
+    .modalDesc p {
+        margin: 0;
+        margin: 10px 0;
+    }
+</style>
+
+<body>
+    <div class="modalScreen">
+        <div class="modalItem">
+
+        </div>
+    </div>
+    <div class="wrapper">
+
+    </div>
+    <script>
+        async function fetchDogs() {
+            const response = await fetch('https://api.thedogapi.com/v1/images/search?size=med&mime_types=jpg&format=json&has_breeds=true&order=RANDOM&page=0&limit=10')
+            const dogs = await response.json()
+            return dogs
+        }
+        var COUNTER = false;
+        let modalScreen = document.getElementsByClassName('modalScreen')[0]
+        let modalItem = document.getElementsByClassName('modalItem')[0]
+        var dogs1 = []
+        //"x-api-key": "05b8ed73-ddad-4ad0-8b8a-26f11864b0ff",    
+        fetchDogs().then(dogs => {
+            dogs1 = dogs
+            createHtml(dogs)
+        })
+
+        function createHtml(param) {
+            let wrapper = document.getElementsByClassName('wrapper')[0]
+            for (let i = 0; i < param.length; i++) {
+                // wrapper.innerHTML += `<div onClick= "openModal(${param[i]})" class="single-item"></div>`
+                // let singleItem = document.querySelectorAll('.single-item')[i]
+                const singleItem = document.createElement("DIV")
+                singleItem.classList.add('single-item')
+                singleItem.addEventListener('click', () => { openModal(param[i]) })
+                singleItem.style.backgroundImage = `url(${param[i].url})`
+                wrapper.appendChild(singleItem)
+            }
+
+        }
+        function openModal(param) {
+            modalScreen.addEventListener('click', (e) => {
+                if (event.target.matches(".modalScreen")
+                ) {
+                    closeTest()
+                }
+
+            })
+            if (COUNTER == false) {
+                modalScreen.style.display = 'flex'
+                modalItem.innerHTML =
+                    `
+                    <div class = "modalHeader">
+                        <h2>${param.breeds[0].name}</h2>
+                        <span  onclick ="openModal()"class = "Xbtn">X</span> 
+                    </div>
+                    <div class="modalBody">
+                        <img src="${param.url}">
+                        <div class= "modalDesc" >
+                            <p>${param.breeds[0].name} is best used for ${param.breeds[0].bred_for}</p>     
+                        </div>
+                    </div>
+                    
+                `
+                COUNTER = true
+            } else {
+                modalScreen.style.display = 'none'
+                COUNTER = false
+            }
+            function closeTest() {
+                modalScreen.style.display = 'none'
+                COUNTER = false
+            }
+
+
+        }
+
+
+
+
+
+
+
+    </script>
+</body>
+
+</html>
